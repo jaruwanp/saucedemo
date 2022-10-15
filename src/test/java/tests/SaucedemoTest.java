@@ -1,5 +1,7 @@
 package tests;
 import base.BaseTest;
+import data.pojos.Person;
+import data.pojos.Product;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -62,7 +64,7 @@ public class SaucedemoTest extends BaseTest {
     }
 
 
-    @Test(testName = "US 304 - test display options", description = "I need an option to see navigation menu. When user clicks the button it should display following buttons:")
+    @Test(testName = "US 304 - Test display options", description = "I need an option to see navigation menu. When user clicks the button it should display following buttons:")
     public void test04(){
         page.login();
         page.click(page.btnBurgerMenu);
@@ -184,4 +186,73 @@ public class SaucedemoTest extends BaseTest {
          page.sleep(1000);
     }
 
+@Test(testName = "US 308 - Checkout: Your Information",
+        description = "Checkout form should have following fields displayed where user can input their details: First Name, Last Name, Zip/Postel Code")
+    public void test08(){
+        Person person = new Person("Jennifr","Phony","54876");
+        boolean result=false;
+        page.login();
+        page.click(page.btnFirstProductItem);
+        page.click(page.btnShoppingCartIcon);
+        page.click(page.btnCheckout);
+
+          page.takeScreenshot();
+        result = page.txtFirstName.isDisplayed();
+        page.logInfo("First Name Field displayed = " + result );
+        Assert.assertTrue(result);
+
+        result = page.txtLastName.isDisplayed();
+        page.logInfo("Last Name field displayed = " + result );
+        Assert.assertTrue(result);
+
+        result = page.txtZipCodee.isDisplayed();
+        page.logInfo("Zip/Postal Code field displayed = " + result );
+        Assert.assertTrue(result);
+        page.sleep(2000);
+    }
+
+    @Test(testName = "US 309 - Add to cart",description = "User should be able to add an item to cart with a click of a button. Added item should be displayed in the Cart view")
+    public void test09(){
+        page.login();
+        Product product = new Product(page.productItems.get(0).getText(),
+                page.productsDesc.get(0).getText(),
+                page.productPrices.get(0).getText());
+
+        page.logInfo(product.toString());
+
+        page.click(page.btnsAddToCart.get(0));
+        page.click(page.btnShoppingCartIcon);
+
+        page.assertEquals(page.productNamesInCart.get(0).getText(),product.getProductName());
+        page.assertEquals(page.productsDescInCart.get(0).getText(),product.getDescription());
+        page.assertEquals(page.productsPricesInCart.get(0).getText(),product.getPrice());
+        page.takeScreenshot();
+        page.sleep(2000);
+
+    }
+
+    @Test(testName = "US 310 - Remove from cart",description = "User should be able to remove added item from the cart with a click of a button")
+    public void test10(){
+        page.login();
+        Product product = new Product(page.productItems.get(0).getText(),
+                page.productsDesc.get(0).getText(),
+                page.productPrices.get(0).getText());
+        page.logInfo(product.toString());
+        page.click(page.btnsAddToCart.get(0));
+        page.click(page.btnShoppingCartIcon);
+        //Check current product in the cart
+        int totalItems;
+        int totalItemsAfterRemove;
+        totalItems = page.productNamesInCart.size();
+        page.logInfo("Total product in the cart = " + totalItems);
+        page.takeScreenshot();
+
+        page.click(page.btnsRemoveProduct.get(0));
+        totalItemsAfterRemove = page.productNamesInCart.size();
+        page.takeScreenshot();
+        page.logInfo("After clicked a REMOVE button, total product in cart = " + totalItemsAfterRemove);
+        Assert.assertTrue(totalItems > totalItemsAfterRemove);
+        page.sleep(1000);
+
+    }
 }
